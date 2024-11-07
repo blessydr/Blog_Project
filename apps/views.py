@@ -31,6 +31,8 @@ def register(request):
             messages.error(request, "Passwords do not match.Please try again!")
     return render(request, 'blog/register.html')
 
+
+
 def signin(request):
     if request.method=="POST":
         username = request.POST.get('username')  
