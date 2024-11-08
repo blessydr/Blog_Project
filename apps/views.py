@@ -4,6 +4,7 @@ from django.contrib import messages
 from .models import Blogs_post,Tag
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def register(request):
@@ -57,7 +58,6 @@ def signout(request):
 def index(request):
     search = request.GET.get('search', '')
     
-    # Check if search is provided and filter based on the search term
     if search:
         blogs = Blogs_post.objects.filter(
             Q(title__icontains=search) | 
@@ -65,17 +65,58 @@ def index(request):
             Q(tags__blog_tag__icontains=search)
         ).distinct()
     else:
-        blogs = Blogs_post.objects.all()  # Get all blogs if no search term is provided
+        blogs = Blogs_post.objects.all() 
 
-    # Fetch all tags, regardless of the search status
+   
     tags = Tag.objects.all()
 
-    # Prepare the context dictionary
+   
     context = {
         'blogs': blogs,
         'tags': tags,
         'search': search
     }
-    
-    # Render the template with the context
     return render(request, 'blog/home.html', context)
+
+
+
+def create_blog(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        tags = request.POST.getlist('tags')  
+        image = request.FILES.get('image') 
+
+      
+        if not title or not description:
+            messages.error(request, "Title and description are required.")
+            return redirect('create_blog')  
+      
+        blog = Blogs_post.objects.create(
+            title=title,
+            description=description,
+            author=request.user,  
+            images=image
+        )
+
+        if tags:
+            for tag_id in tags:
+                tag = Tag.objects.get(id=tag_id)
+                blog.tags.add(tag)
+        
+       
+        blog.save()
+
+     
+        messages.success(request, "Your blog has been created successfully!")
+        return redirect('home') 
+
+   
+    tags = Tag.objects.all()  
+    return render(request, 'blog/create_blog.html', {'tags': tags})
+
+
+def blog_details(request,pk):
+    blog = Blogs_post.objects.get(id=pk)
+    context = {'blog': blog}
+    return render(request, 'blog/blog_details.html', context)
