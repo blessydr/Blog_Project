@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
+from .models import Blogs_post,Tag
+from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
@@ -50,3 +52,30 @@ def signin(request):
 def signout(request):
     logout(request)
     return redirect('home')
+
+
+def index(request):
+    search = request.GET.get('search', '')
+    
+    # Check if search is provided and filter based on the search term
+    if search:
+        blogs = Blogs_post.objects.filter(
+            Q(title__icontains=search) | 
+            Q(description__icontains=search) | 
+            Q(tags__blog_tag__icontains=search)
+        ).distinct()
+    else:
+        blogs = Blogs_post.objects.all()  # Get all blogs if no search term is provided
+
+    # Fetch all tags, regardless of the search status
+    tags = Tag.objects.all()
+
+    # Prepare the context dictionary
+    context = {
+        'blogs': blogs,
+        'tags': tags,
+        'search': search
+    }
+    
+    # Render the template with the context
+    return render(request, 'blog/home.html', context)

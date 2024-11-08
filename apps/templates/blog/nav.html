@@ -1,5 +1,4 @@
 {% block content %}
-
 <style>
     /* Basic Reset */
     * {
@@ -71,25 +70,27 @@
         transform: scale(1.05);
     }
 
-    /* Search Input Styles */
+    /* Centered Search Form Styles */
     .search-form {
         display: flex;
-        justify-content: space-between;
+        justify-content: center; /* Center items horizontally */
         align-items: center;
-        margin: 20px 0;
-        flex-grow: 1;
+        text-align: center;
+        margin: 20px auto; /* Center the search form on the page */
+        gap: 20px; /* Space between items */
+        max-width: 800px; /* Control width of the search form */
     }
 
     .search-input {
         padding: 12px;
         border: 2px solid #444; /* Dark border */
         border-radius: 30px;
-        flex-grow: 1;
         font-size: 1.1em;
-        margin-right: 10px;
         background-color: #2c3e50; /* Dark blue-grey background */
         color: #ecf0f1; /* Light text */
         transition: border 0.3s, box-shadow 0.3s, transform 0.3s;
+        width: 100%; /* Full width */
+        max-width: 300px; /* Set max width */
     }
 
     .search-input:focus {
@@ -116,6 +117,11 @@
         transform: scale(1.05);
     }
 
+    .blog-count {
+        color: #fff;
+        font-size: 1.1em;
+    }
+
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
         .navbar {
@@ -136,9 +142,16 @@
         .search-form {
             flex-direction: column;
             gap: 10px;
+            width: 100%; /* Full width on mobile */
+        }
+
+        .search-input,
+        .search-button {
+            width: 100%; /* Full width on mobile */
         }
     }
 </style>
+
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
@@ -150,9 +163,9 @@
         <div class="links">
             {% if request.user.is_authenticated %}
                 <a href="{% url 'profile' %}"><i class="fa fa-user"></i> Profile</a>
-                <a href="{% url 'Signout' %}"><i class="fa fa-sign-out-alt"></i> Logout</a>
+                <a href="{% url 'signout' %}"><i class="fa fa-sign-out-alt"></i> Logout</a>
             {% else %}
-                <a href="{% url 'Signin' %}"><i class="fa fa-sign-in-alt"></i> Login</a>
+                <a href="{% url 'signin' %}"><i class="fa fa-sign-in-alt"></i> Login</a>
             {% endif %}
         </div>
     </div>
@@ -160,7 +173,6 @@
 
 <div class="container">
     <div class="search-form">
-        <a class="create-blog-button" href="{% url 'create' %}"><i class="fa fa-pencil-alt"></i> Create Blog</a>  
         <form action="{% url 'home' %}" method="get" style="flex-grow: 1;">
             <input class="search-input" type="text" name="search" placeholder="Search Blog ...">
             <button class="search-button" type="submit">Search</button>
